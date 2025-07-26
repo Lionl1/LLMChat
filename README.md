@@ -3,7 +3,6 @@
 A Streamlit-based chat interface for interacting with local large language models.
 
 ## Features
-- ß
 - Chat interface with message history
 - Multiple chat management
 - Bilingual support (English/Russian)
