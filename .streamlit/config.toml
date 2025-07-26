@@ -1,0 +1,19 @@
+[theme]
+# Основные цвета
+primaryColor="#4CAF50"  # Зеленый, как в VS Code
+backgroundColor="#1E1E1E"  # Темный фон как в IDE
+secondaryBackgroundColor="#252526"  # Чуть светлее для контраста
+textColor="#D4D4D4"  # Светло-серый текст
+
+# Шрифты
+font="IBM Plex Mono"
+
+# Цвета элементов
+# Зеленый для успешных действий
+successColor="#4CAF50"
+# Красный для ошибок
+errorColor="#F44336"
+# Оранжевый для предупреждений
+warningColor="#FFA726"
+# Синий для информационных сообщений
+infoColor="#2196F3"
