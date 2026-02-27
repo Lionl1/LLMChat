@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      EXTRACT_TEXT_API_URL: http://extract-text:7555
+    depends_on:
+      - extract-text
+
+  extract-text:
+    build:
+      context: .
+      dockerfile: docker/extract-text.Dockerfile
+    ports:
+      - "7555:7555"

@@ -2,11 +2,12 @@
 import os
 import sys
 
-# Add the project root directory to Python path
+import uvicorn
+
 project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
 
-from src.main import main
-
 if __name__ == "__main__":
-    main()
+    host = os.getenv("APP_HOST", "127.0.0.1")
+    port = int(os.getenv("APP_PORT", "8000"))
+    uvicorn.run("src.server:app", host=host, port=port, reload=True)

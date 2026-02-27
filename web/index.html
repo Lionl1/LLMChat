@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Local LLM Chat</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="sidebar-title">Chats</div>
+        <button id="newChatBtn" class="btn primary">New Chat</button>
+        <div id="chatList" class="chat-list"></div>
+        <div class="sidebar-actions">
+          <button id="clearChatBtn" class="btn ghost">Clear</button>
+          <button id="deleteChatBtn" class="btn ghost danger">Delete</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="brand">Local LLM Chat</div>
+          <div class="topbar-actions">
+            <button id="settingsBtn" class="btn ghost">Settings</button>
+          </div>
+        </div>
+
+        <div id="messages" class="messages"></div>
+        <div id="statusMessage" class="status-message" aria-live="polite"></div>
+
+        <div class="composer">
+          <button id="addFilesBtn" class="btn ghost">Files</button>
+          <input id="fileInput" type="file" multiple hidden />
+          <textarea id="messageInput" placeholder="Type your message..."></textarea>
+          <button id="sendBtn" class="btn primary">Send</button>
+        </div>
+      </main>
+    </div>
+
+    <div id="drawerBackdrop" class="drawer-backdrop"></div>
+    <div id="settingsDrawer" class="drawer">
+      <div class="drawer-header">
+        <div class="drawer-title">Settings</div>
+        <button id="closeSettingsBtn" class="btn ghost">Close</button>
+      </div>
+
+      <div class="drawer-section">
+        <label class="field">
+          <span>API URL</span>
+          <input id="apiUrlInput" type="text" placeholder="http://localhost:8000/v1/chat/completions" />
+        </label>
+        <label class="field">
+          <span>API Key</span>
+          <input id="apiKeyInput" type="password" placeholder="env: API_KEY" />
+        </label>
+        <label class="field">
+          <span>Model</span>
+          <input id="modelInput" type="text" placeholder="local-model" />
+        </label>
+      </div>
+
+      <div class="drawer-section">
+        <label class="field">
+          <span>Temperature</span>
+          <input id="temperatureInput" type="range" min="0" max="2" step="0.01" />
+          <span id="temperatureValue" class="field-value"></span>
+        </label>
+        <label class="field">
+          <span>Max tokens</span>
+          <input id="maxTokensInput" type="number" min="1" />
+        </label>
+        <label class="field">
+          <span>Top P</span>
+          <input id="topPInput" type="range" min="0" max="1" step="0.01" />
+          <span id="topPValue" class="field-value"></span>
+        </label>
+      </div>
+
+      <div class="drawer-section">
+        <label class="field">
+          <span>Extract-text URL</span>
+          <input id="extractUrlInput" type="text" placeholder="http://localhost:7555" />
+        </label>
+      </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
