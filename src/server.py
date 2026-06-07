@@ -50,6 +50,7 @@ def config() -> Dict[str, Any]:
         "model": AppConfig.DEFAULT_MODEL,
         "extract_api_url": AppConfig.EXTRACT_TEXT_API_URL,
         "system_message": AppConfig.DEFAULT_SYSTEM_MESSAGE.get("en", ""),
+        "system_messages": AppConfig.DEFAULT_SYSTEM_MESSAGE,
         "params": {
             "temperature": AppConfig.DEFAULT_TEMPERATURE,
             "max_tokens": AppConfig.DEFAULT_MAX_TOKENS,

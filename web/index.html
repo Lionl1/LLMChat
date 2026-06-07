@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Local LLM Chat</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
@@ -30,12 +31,30 @@
         <div id="statusMessage" class="status-message" aria-live="polite"></div>
 
         <div class="composer">
-          <button id="addFilesBtn" class="btn ghost">Files</button>
-          <input id="fileInput" type="file" multiple hidden />
-          <textarea id="messageInput" placeholder="Type your message..."></textarea>
-          <button id="sendBtn" class="btn primary">Send</button>
+          <div id="attachmentsList" class="attachments-list"></div>
+          <div class="composer-inputs">
+            <button id="addFilesBtn" class="btn ghost" type="button">Files</button>
+            <input id="fileInput" type="file" multiple hidden />
+            <textarea id="messageInput" placeholder="Type your message... (Double-click chats in sidebar to rename)"></textarea>
+            <button id="sendBtn" class="btn primary" type="button">Send</button>
+          </div>
         </div>
       </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="confirmTitle" class="modal-title">Confirm Action</h3>
+        </div>
+        <div id="confirmBody" class="modal-body">Are you sure you want to proceed?</div>
+        <div class="modal-footer">
+          <button id="confirmCancelBtn" class="btn ghost">Cancel</button>
+          <button id="confirmOkBtn" class="btn primary danger">Proceed</button>
+        </div>
+      </div>
     </div>
 
     <div id="drawerBackdrop" class="drawer-backdrop"></div>
@@ -62,6 +81,20 @@
 
       <div class="drawer-section">
         <label class="field">
+          <span>Language</span>
+          <select id="languageSelect" class="select-field">
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>System Prompt</span>
+          <textarea id="systemPromptInput" rows="3" placeholder="You are a helpful assistant..."></textarea>
+        </label>
+      </div>
+
+      <div class="drawer-section">
+        <label class="field">
           <span>Temperature</span>
           <input id="temperatureInput" type="range" min="0" max="2" step="0.01" />
           <span id="temperatureValue" class="field-value"></span>
@@ -83,8 +116,14 @@
           <input id="extractUrlInput" type="text" placeholder="http://localhost:7555" />
         </label>
       </div>
+
+      <div class="drawer-actions">
+        <button id="resetSettingsBtn" class="btn ghost">Reset to Defaults</button>
+      </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
     <script src="/static/app.js"></script>
   </body>
 </html>
