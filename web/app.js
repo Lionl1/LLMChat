@@ -39,44 +39,54 @@ const STORAGE_CHAT_KEY = "llmchat.chats";
 const STORAGE_CHAT_CURRENT = "llmchat.current";
 const STORAGE_SETTINGS = "llmchat.settings";
 
-// Configure Marked.js renderer with custom code styling and escape helper
-const renderer = new marked.Renderer();
-renderer.code = function({ text, lang }) {
-  const language = lang || "plaintext";
-  let highlighted;
-  try {
-    highlighted = hljs.highlight(text, { language: hljs.getLanguage(language) ? language : 'plaintext' }).value;
-  } catch {
-    highlighted = text;
-  }
-  
-  // Clean text for copy operation
-  const escapedText = text
+function escapeHtml(value) {
+  return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-    
+}
+
+// Model output and imported files are untrusted: sanitize rendered Markdown.
+function renderMarkdown(text) {
+  return DOMPurify.sanitize(marked.parse(text));
+}
+
+// Configure Marked.js renderer with custom code styling
+const renderer = new marked.Renderer();
+renderer.code = function({ text, lang }) {
+  const language = hljs.getLanguage(lang || "") ? lang : "plaintext";
+  let highlighted;
+  try {
+    highlighted = hljs.highlight(text, { language }).value;
+  } catch {
+    highlighted = escapeHtml(text);
+  }
+
   return `
     <div class="code-block-wrapper">
       <div class="code-block-header">
-        <span>${language}</span>
-        <button class="code-block-copy-btn" type="button" onclick="copyCodeBlock(this, \`${escapedText}\`)">Copy</button>
+        <span>${escapeHtml(language)}</span>
+        <button class="code-block-copy-btn" type="button">Copy</button>
       </div>
-      <pre><code class="hljs language-${language}">${highlighted}</code></pre>
+      <pre><code class="hljs language-${escapeHtml(language)}">${highlighted}</code></pre>
     </div>
   `;
 };
 marked.use({ renderer });
 
-// Global helper for code block copying
-window.copyCodeBlock = function(btn, text) {
-  const textarea = document.createElement("textarea");
-  textarea.innerHTML = text;
-  const decodedText = textarea.value;
+document.addEventListener("click", (event) => {
+  const btn = event.target.closest(".code-block-copy-btn");
+  const code = btn?.closest(".code-block-wrapper")?.querySelector("code");
+  if (code) {
+    copyCodeBlock(btn, code.textContent);
+  }
+});
 
-  navigator.clipboard.writeText(decodedText).then(() => {
+// Helper for code block copying
+function copyCodeBlock(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
     const originalText = btn.textContent;
     btn.textContent = "Copied!";
     btn.style.color = "var(--accent)";
@@ -87,7 +97,7 @@ window.copyCodeBlock = function(btn, text) {
   }).catch(() => {
     btn.textContent = "Error";
   });
-};
+}
 
 // Collapsible attachments toggle
 window.toggleRawAttachments = function(badge) {
@@ -314,13 +324,13 @@ function renderMessages() {
 
         const fileMatches = [...filesPart.matchAll(/File: ([^\n]+)/g)].map(m => m[1]);
         attachmentsHtml = `
-          <div class="msg-attachments-badge" onclick="toggleRawAttachments(this)">📁 Attached: ${fileMatches.join(", ")} (click to view raw text)</div>
-          <div class="msg-attachments-content" style="display: none;"><pre>${filesPart}</pre></div>
+          <div class="msg-attachments-badge" onclick="toggleRawAttachments(this)">📁 Attached: ${escapeHtml(fileMatches.join(", "))} (click to view raw text)</div>
+          <div class="msg-attachments-content" style="display: none;"><pre>${escapeHtml(filesPart)}</pre></div>
         `;
       }
     }
 
-    textNode.innerHTML = marked.parse(contentToRender);
+    textNode.innerHTML = renderMarkdown(contentToRender);
     if (attachmentsHtml) {
       textNode.insertAdjacentHTML("afterbegin", attachmentsHtml);
     }
@@ -397,7 +407,7 @@ async function sendMessage() {
     errEl.className = "message assistant error-message";
     errEl.style.borderLeft = "4px solid var(--danger)";
     errEl.style.background = "rgba(255, 92, 92, 0.08)";
-    errEl.innerHTML = `<div class="message-text">⚠️ <strong>Error contacting API:</strong> ${err.message}</div>`;
+    errEl.innerHTML = `<div class="message-text">⚠️ <strong>Error contacting API:</strong> ${escapeHtml(err.message)}</div>`;
     messagesEl.appendChild(errEl);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   } finally {

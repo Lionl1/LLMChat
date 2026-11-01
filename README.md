@@ -35,7 +35,7 @@ Edit the `.env` file and set the API connection details:
 API_KEY=your_api_key_here
 API_URL=http://localhost:8000/v1/chat/completions
 MODEL_NAME=local-model
-API_TIMEOUT=15
+API_TIMEOUT=120
 EXTRACT_TEXT_API_URL=http://localhost:7555
 EXTRACT_TEXT_TIMEOUT=120
 MAX_IMPORTED_CHARS=20000

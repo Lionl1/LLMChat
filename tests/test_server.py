@@ -76,6 +76,30 @@ def test_extract_combines_files(client):
     assert response.json()["text"] == "File: a.txt\nalpha"
 
 
+def sent_api_key(client, monkeypatch, **payload):
+    monkeypatch.setenv("API_KEY", "server-secret")
+    reply = {"choices": [{"message": {"content": "ok"}}]}
+    with patch("src.server.request_chat_completion", return_value=reply) as completion:
+        client.post("/api/chat", json=chat_payload(**payload))
+    return completion.call_args.kwargs["api_key"]
+
+
+def test_server_key_is_used_for_configured_endpoint(client, monkeypatch):
+    assert sent_api_key(client, monkeypatch) == "server-secret"
+
+
+def test_server_key_is_not_sent_to_client_supplied_endpoint(client, monkeypatch):
+    key = sent_api_key(client, monkeypatch, api_url="https://attacker.example/v1/chat/completions")
+    assert not key
+
+
+def test_client_key_is_forwarded_to_client_endpoint(client, monkeypatch):
+    key = sent_api_key(
+        client, monkeypatch, api_url="https://other.example/v1/chat/completions", api_key="mine"
+    )
+    assert key == "mine"
+
+
 def test_extract_ignores_client_supplied_service_url(client):
     with patch("src.server.extract_text_from_file", return_value=[]) as extract:
         client.post(

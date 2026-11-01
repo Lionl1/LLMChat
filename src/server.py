@@ -59,7 +59,11 @@ def config() -> Dict[str, Any]:
 
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(request: ChatRequest) -> ChatResponse:
-    api_key = request.api_key or os.getenv(AppConfig.API_KEY_ENV_VAR, "")
+    api_key = request.api_key
+    # The server's own key goes only to the server's configured endpoint:
+    # api_url comes from the client and could point anywhere.
+    if not api_key and request.api_url == AppConfig.API_URL:
+        api_key = os.getenv(AppConfig.API_KEY_ENV_VAR, "")
     try:
         response = request_chat_completion(
             api_url=request.api_url,
