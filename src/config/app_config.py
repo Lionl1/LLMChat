@@ -15,7 +15,7 @@ class AppConfig:
     # API configuration
     API_URL: str = os.getenv('API_URL', 'http://localhost:8000/v1/chat/completions')
     API_KEY_ENV_VAR: str = "API_KEY"
-    TIMEOUT: int = int(os.getenv('API_TIMEOUT', '15'))
+    TIMEOUT: int = int(os.getenv('API_TIMEOUT', '120'))
     DEFAULT_MODEL: str = os.getenv('MODEL_NAME', 'local-model')
 
     # Extract-text service configuration
