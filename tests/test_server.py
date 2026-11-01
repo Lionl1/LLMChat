@@ -73,3 +73,27 @@ def test_extract_combines_files(client):
         response = client.post("/api/extract", files={"files": ("a.txt", b"alpha")})
     assert response.status_code == 200
     assert response.json()["text"] == "File: a.txt\nalpha"
+
+
+def sent_api_key(client, monkeypatch, **payload):
+    monkeypatch.setenv("API_KEY", "server-secret")
+    reply = {"choices": [{"message": {"content": "ok"}}]}
+    with patch("src.server.request_chat_completion", return_value=reply) as completion:
+        client.post("/api/chat", json=chat_payload(**payload))
+    return completion.call_args.kwargs["api_key"]
+
+
+def test_server_key_is_used_for_configured_endpoint(client, monkeypatch):
+    assert sent_api_key(client, monkeypatch) == "server-secret"
+
+
+def test_server_key_is_not_sent_to_client_supplied_endpoint(client, monkeypatch):
+    key = sent_api_key(client, monkeypatch, api_url="https://attacker.example/v1/chat/completions")
+    assert not key
+
+
+def test_client_key_is_forwarded_to_client_endpoint(client, monkeypatch):
+    key = sent_api_key(
+        client, monkeypatch, api_url="https://other.example/v1/chat/completions", api_key="mine"
+    )
+    assert key == "mine"
