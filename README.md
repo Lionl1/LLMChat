@@ -64,6 +64,13 @@ docker compose up --build
 Chat UI: `http://127.0.0.1:8000`  
 Extract-text: `http://127.0.0.1:7555`
 
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+python -m pytest
+```
+
 ## Project Structure
 
 ```
