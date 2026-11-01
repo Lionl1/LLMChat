@@ -4,6 +4,7 @@ import pytest
 import requests
 from fastapi.testclient import TestClient
 
+from src.config.app_config import AppConfig
 from src.server import app
 
 
@@ -73,3 +74,13 @@ def test_extract_combines_files(client):
         response = client.post("/api/extract", files={"files": ("a.txt", b"alpha")})
     assert response.status_code == 200
     assert response.json()["text"] == "File: a.txt\nalpha"
+
+
+def test_extract_ignores_client_supplied_service_url(client):
+    with patch("src.server.extract_text_from_file", return_value=[]) as extract:
+        client.post(
+            "/api/extract",
+            files={"files": ("a.txt", b"alpha")},
+            data={"extract_api_url": "http://169.254.169.254/latest"},
+        )
+    assert extract.call_args.args[2] == AppConfig.EXTRACT_TEXT_API_URL
