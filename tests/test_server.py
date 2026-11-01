@@ -4,6 +4,7 @@ import pytest
 import requests
 from fastapi.testclient import TestClient
 
+from src.config.app_config import AppConfig
 from src.server import app
 
 
@@ -97,3 +98,13 @@ def test_client_key_is_forwarded_to_client_endpoint(client, monkeypatch):
         client, monkeypatch, api_url="https://other.example/v1/chat/completions", api_key="mine"
     )
     assert key == "mine"
+
+
+def test_extract_ignores_client_supplied_service_url(client):
+    with patch("src.server.extract_text_from_file", return_value=[]) as extract:
+        client.post(
+            "/api/extract",
+            files={"files": ("a.txt", b"alpha")},
+            data={"extract_api_url": "http://169.254.169.254/latest"},
+        )
+    assert extract.call_args.args[2] == AppConfig.EXTRACT_TEXT_API_URL

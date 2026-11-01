@@ -22,7 +22,6 @@ const temperatureValue = document.getElementById("temperatureValue");
 const maxTokensInput = document.getElementById("maxTokensInput");
 const topPInput = document.getElementById("topPInput");
 const topPValue = document.getElementById("topPValue");
-const extractUrlInput = document.getElementById("extractUrlInput");
 
 // New Settings elements
 const languageSelect = document.getElementById("languageSelect");
@@ -116,7 +115,6 @@ window.toggleRawAttachments = function(badge) {
 let config = {
   api_url: "http://localhost:8000/v1/chat/completions",
   model: "local-model",
-  extract_api_url: "http://localhost:7555",
   system_message: "You are a helpful AI assistant.",
   system_messages: {
     en: "You are a helpful AI assistant.",
@@ -424,7 +422,6 @@ async function handleFiles(files) {
 
   const data = new FormData();
   Array.from(files).forEach((file) => data.append("files", file, file.name));
-  data.append("extract_api_url", settings.extract_api_url || "");
 
   try {
     const response = await fetch("/api/extract", { method: "POST", body: data });
@@ -511,7 +508,6 @@ function bindSettings() {
   maxTokensInput.value = settings.max_tokens;
   topPInput.value = settings.top_p;
   topPValue.textContent = settings.top_p.toFixed(2);
-  extractUrlInput.value = settings.extract_api_url || "";
   
   // Set language selector
   languageSelect.value = settings.language || "en";
@@ -546,10 +542,6 @@ function bindSettings() {
     topPValue.textContent = settings.top_p.toFixed(2);
     saveSettings();
   });
-  extractUrlInput.addEventListener("input", () => {
-    settings.extract_api_url = extractUrlInput.value.trim();
-    saveSettings();
-  });
 
   languageSelect.addEventListener("change", () => {
     const oldLang = settings.language || "en";
@@ -582,7 +574,6 @@ function bindSettings() {
       temperature: config.params.temperature,
       max_tokens: config.params.max_tokens,
       top_p: config.params.top_p,
-      extract_api_url: config.extract_api_url || "",
       language: "en",
       system_prompt: config.system_messages ? config.system_messages["en"] : config.system_message
     };
@@ -610,7 +601,6 @@ async function init() {
       temperature: config.params.temperature,
       max_tokens: config.params.max_tokens,
       top_p: config.params.top_p,
-      extract_api_url: config.extract_api_url || "",
       language: "en",
       system_prompt: config.system_messages ? config.system_messages["en"] : config.system_message
     };

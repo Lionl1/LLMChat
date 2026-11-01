@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 import os
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -48,7 +48,6 @@ def config() -> Dict[str, Any]:
     return {
         "api_url": AppConfig.API_URL,
         "model": AppConfig.DEFAULT_MODEL,
-        "extract_api_url": AppConfig.EXTRACT_TEXT_API_URL,
         "system_message": AppConfig.DEFAULT_SYSTEM_MESSAGE.get("en", ""),
         "system_messages": AppConfig.DEFAULT_SYSTEM_MESSAGE,
         "params": {
@@ -96,11 +95,10 @@ def chat(request: ChatRequest) -> ChatResponse:
     return ChatResponse(message=message)
 
 @app.post("/api/extract")
-async def extract(
-    files: List[UploadFile] = File(...),
-    extract_api_url: Optional[str] = Form(None),
-) -> Dict[str, Any]:
-    api_url = extract_api_url or AppConfig.EXTRACT_TEXT_API_URL
+async def extract(files: List[UploadFile] = File(...)) -> Dict[str, Any]:
+    # Only the configured service: a URL from the client would let anyone
+    # make the server send requests (and uploaded files) to any host.
+    api_url = AppConfig.EXTRACT_TEXT_API_URL
     if not api_url:
         raise HTTPException(status_code=400, detail="Extract-text API URL is required.")
 
